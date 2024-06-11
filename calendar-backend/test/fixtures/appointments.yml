@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  start_datetime: 2024-06-04 22:46:05
+  coach: one
+  student: one
+  student_satisfaction_score: 1
+  notes: MyString
+
+two:
+  start_datetime: 2024-06-04 22:46:05
+  coach: two
+  student: two
+  student_satisfaction_score: 1
+  notes: MyString

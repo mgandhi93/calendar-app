@@ -1,0 +1,11 @@
+.button {
+    margin: 1rem;
+    background-color: darkcyan;
+    padding: 10px;
+    font-weight: 400;
+
+}
+
+.button:disabled {
+    color: gray;
+}
