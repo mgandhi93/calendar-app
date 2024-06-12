@@ -12,11 +12,14 @@ Rails.application.routes.draw do
         get '/appointmentsForDate', to: 'appointments#appointments_for_date'
         post '/appointment', to: 'appointments#create'
         post '/markAppointmentComplete', to: 'appointments#transition_appointment_to_complete'
+        post '/setNotes', to: 'appointments#set_notes'
+        post '/setStudentSatisfactionScore', to: 'appointments#set_student_satisfaction_score'
       end
 
       resources :students, only: [:show, :index, :create] do
         get '/appointments', to: 'appointments#available_appointments_for_date'
         post '/book_appointment', to: 'appointments#book_appointment'
+        get '/bookedAppointments', to: 'appointments#booked_appointments_for_date'
       end
 
       post '/login', to: 'sessions#create'

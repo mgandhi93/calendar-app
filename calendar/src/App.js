@@ -15,7 +15,7 @@ import Logout from './Logout.js';
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [userRole, setUserRole] = useState("Student");
+  const [userRole, setUserRole] = useState(null);
   const [date, setDate] = useState(new Date());
 
   function handleLogin(data) {
@@ -49,7 +49,7 @@ export default function App() {
           <Routes>
             <Route
               exact path='/'
-              element={<Home handleLogout={handleLogout} loggedInStatus={isLoggedIn }/>}
+              element={<Home handleLogout={handleLogout} loggedInStatus={isLoggedIn}/>}
             />
             <Route
               exact path='/login'
@@ -70,12 +70,11 @@ export default function App() {
         {
           user && 
             <div>
-              Welcome, {user.first_name} {user.last_name}
+              Welcome, {user.first_name} {user.last_name}<br></br>
             </div>
         }
-        
         {
-          user === null ? <div>Please log in</div> : user.type === "Coach" ? <CoachCalendar coach_id={user.id} /> : <StudentCalendar student_id={user.id} />
+          user === null ? <div>Please log in</div> : userRole === "Coach" ? <CoachCalendar coach_id={user.id} /> : userRole === "Student" ? <StudentCalendar student_id={user.id} /> : null
         }
       </div>
     </>

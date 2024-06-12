@@ -1,3 +1,3 @@
 class Student < User
-    has_many :appointments
+  has_many :appointments
 end

@@ -1,34 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
-import Calendar from 'react-calendar';
-import { BrowserRouter } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <App />
 );
-
-// function MyApp() {
-//   const [value, setValue] = useState(new Date());
-
-//   function onChange(nextValue) {
-//     setValue(nextValue);
-//   }
-
-//   return (
-//     <Calendar
-//       onChange={onChange}
-//       value={value}
-//     />
-//   )
-// }
-
-
 
 // // If you want to start measuring performance in your app, pass a function
 // // to log results (for example: reportWebVitals(console.log))

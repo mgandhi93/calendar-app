@@ -3,7 +3,6 @@
   height: fit-content;
   display: flex;
   flex-direction: column;
-/*  justify-content: center;*/
   align-items: center;
 }
 
@@ -17,9 +16,8 @@
   background-color: darkcyan;
   padding: 10px;
   font-weight: 400;
-
 }
 
 .button:disabled {
-  color: gray;
+  background-color: gray;
 }

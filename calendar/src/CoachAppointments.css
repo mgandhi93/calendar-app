@@ -1,3 +1,21 @@
-input {
-  size: 100px;
+.input {
+  width: 250px;
+  height: 100px;
+}
+
+.button {
+  margin: 1rem;
+  background-color: darkcyan;
+  padding: 10px;
+  font-weight: 400;
+  width: 100px;
+}
+
+.button:disabled {
+  color: gray;
+}
+
+.notes {
+  width: 250px;
+  height: 100px;
 }
