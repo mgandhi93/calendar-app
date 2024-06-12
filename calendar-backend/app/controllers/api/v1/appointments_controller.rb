@@ -68,23 +68,23 @@ class Api::V1::AppointmentsController < ApplicationController
   end
 
   def set_notes
-    @appointment = Appointment.find_by(appointment_params[:id].to_s)
-    if @appointment
-      @appointment.notes = appointment_params[:notes]
-      if @appointment.save
+    appointment = Appointment.find_by(id: appointment_params[:id].to_s)
+    if appointment
+      appointment.notes = appointment_params[:notes]
+      if appointment.save
         render json: {
-          appointment: @appointment
+          appointment: appointment
         }
       else
         render json: {
           status: 500,
-          errors: [@appointment.errors.full_messages]
+          errors: [appointment.errors.full_messages]
         }
       end
     else
       render json: {
         status: 500,
-        errors: [@appointment.errors.full_messages]
+        errors: [appointment.errors.full_messages]
       }
     end
   end
@@ -105,23 +105,23 @@ class Api::V1::AppointmentsController < ApplicationController
   end
 
   def set_student_satisfaction_score
-    @appointment = Appointment.find_by(appointment_params[:id].to_s)
-    if @appointment
-      @appointment.student_satisfaction_score = appointment_params[:student_satisfaction_score]
-      if @appointment.save
+    appointment = Appointment.find_by(id: appointment_params[:id].to_s)
+    if appointment
+      appointment.student_satisfaction_score = appointment_params[:student_satisfaction_score].to_i
+      if appointment.save
         render json: {
-          appointment: @appointment
+          appointment: appointment
         }
       else
         render json: {
           status: 500,
-          errors: [@appointment.errors.full_messages]
+          errors: [appointment.errors.full_messages]
         }
       end
     else
       render json: {
         status: 500,
-        errors: [@appointment.errors.full_messages]
+        errors: [appointment.errors.full_messages]
       }
     end
   end
@@ -155,13 +155,6 @@ class Api::V1::AppointmentsController < ApplicationController
       }
     end
   end
-
-  # Appointment States
-  # "Open" - appointment slot is open, but coach has yet to create appointment for that slot
-  # "Available" - coach has created the appointment but it has not yet been booked by a student
-  # "Booked" - appointment was available and was booked by a student
-  # "Complete" - the appointment was successfully complete. Notes & Student Satisfaction Score should be recorded now.
-  appointment_states = ["Open", "Available", "Booked", "Complete"]
 
   private
   def appointment_params

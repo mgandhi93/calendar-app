@@ -16,7 +16,6 @@ export default function CoachAppointments({ coach_id, date }) {
       ).then(response => {
         if (response.data.appointments) {
           setAppointments(response.data.appointments);
-          // formatButtons(appointments);
         } else {
           debugger;
           console.log("Failed to get appointments for coach");
@@ -72,7 +71,7 @@ export default function CoachAppointments({ coach_id, date }) {
                         </li>
                       </> : appt.status === "Complete" && appt.student_satisfaction_score !== null ?
                       <>
-                        <li>appt.student_satisfaction_score</li>
+                        <li>Student Satisfaction Score: {appt.student_satisfaction_score}</li>
                       </> : null
                 }
                 {
@@ -81,13 +80,13 @@ export default function CoachAppointments({ coach_id, date }) {
                       <>
                         <li>Notes:<br></br>
                           <form onSubmit={(e) => submitNotes(e, appt, coach_id, setNotes)}>
-                            <input type="text" className="input"></input><br></br>
-                            <button type="submit" className="button" onClick={(e) => submitNotes(e, appt, notesRef, coach_id, setNotes)}>Submit</button>
+                            <input type="text" className="input" onChange={(e) => handleChange(e, setNotes)}></input><br></br>
+                            <button type="submit" className="button" onClick={(e) => submitNotes(e, appt, coach_id, notes, setNotes)}>Submit</button>
                           </form>
                         </li>
                       </> : appt.status === "Complete" && appt.notes !== null ? 
                       <>
-                        <li>appt.notes</li>
+                        <li>Notes: {appt.notes}</li>
                       </> : null
                 }
               </ul>
@@ -102,32 +101,32 @@ export default function CoachAppointments({ coach_id, date }) {
 	);
 }
 
-function submitNotes(event, appt, coach_id, setNotes) {
-  event.preventDefault();
+function handleChange(event, setNotes) {
+  setNotes(event.target.value);
+}
 
-  let notes = event.target;
+function submitNotes(event, appt, coach_id, notes, setNotes) {
+  event.preventDefault();
 
   let appointment = {
     id: appt.id,
-    note: notes
+    notes: notes
   }
 
-  // console.log(`THESE ARE THE NOTES: ${JSON.stringify(appointment)}`);
   axios.post(`http://localhost:3001/api/v1/coaches/${coach_id}/setNotes`, {appointment}, 
     {withCredentials: true}
   ).then(response => {
     // console.log(`RESPONSE: ${JSON.stringify(response)}`)
-    setNotes(response.data.appointment.notes);
+    // setNotes(response.data.appointment.notes);
   });
 }
 
 function submitStudentSatisfactionScore(score, appt, coach_id, setScore) {
-  console.log(`STUDENT SCORE: ${score}`)
   let appointment = {
     id: appt.id,
     student_satisfaction_score: score
   }
-  //make sure param is getting populated with input data
+
   axios.post(`http://localhost:3001/api/v1/coaches/${coach_id}/setStudentSatisfactionScore`, {appointment},
     {withCredentials: true}
   ).then(response => {

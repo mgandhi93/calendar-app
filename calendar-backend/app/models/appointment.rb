@@ -2,9 +2,10 @@ class Appointment < ApplicationRecord
   belongs_to :coach, class_name: "User"
   belongs_to :student, class_name: "User", optional: true
 
-  # validates :student_satisfaction_score, null: true, inclusion: 1..5
+  validates :student_satisfaction_score, inclusion: 1..5
 
   validates :start_datetime, uniqueness: true, on: :create
+  validates :status, inclusion: { in: ["Available", "Booked", "Complete"] }
 
   scope :all_appts_for_date, ->(date) { where(start_datetime: date.to_date.beginning_of_day..date.to_date.end_of_day) }
   scope :all_appts_for_coach, ->(coach) { where(coach: coach) }
