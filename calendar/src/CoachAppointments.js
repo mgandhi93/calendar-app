@@ -1,13 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './CoachAppointments.css';
 
 export default function CoachAppointments({ coach_id, date }) {
-  const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState(null);
   const [update, triggerUpdate] = useState(null);
   const [score, setScore] = useState(null);
   const [notes, setNotes] = useState(null);
-  const notesRef = useRef(null);
 
   useEffect(() => {
     axios.get(`http://localhost:3001/api/v1/coaches/${coach_id}/appointmentsForDate/`,
@@ -17,26 +16,25 @@ export default function CoachAppointments({ coach_id, date }) {
         if (response.data.appointments) {
           setAppointments(response.data.appointments);
         } else {
-          debugger;
           console.log("Failed to get appointments for coach");
         }
       })
-  }, [date, coach_id]);
+  }, [date, coach_id, update, score, notes]);
 
   useEffect(() => {
     formatButtons(appointments);
-  }, [appointments, date]);
+  }, [appointments, date, update]);
     
   return (
     <>
       <div>
         <h2>Appointment Slots for {date.toString()}</h2>
         <br></br>
-        <button id="8AM" className="button"  onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(8), event, triggerUpdate) }>8AM</button>
-          <button id="10AM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(10), event, triggerUpdate)}>10AM</button>
-          <button id="12PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(12), event, triggerUpdate)}>12PM</button>
-          <button id="2PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(14), event, triggerUpdate)}>2PM</button>
-          <button id="4PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(16), event, triggerUpdate)}>4PM</button>
+        <button id="8AM" className="button"  onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(8), event, setAppointments) }>8AM</button>
+          <button id="10AM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(10), event, setAppointments)}>10AM</button>
+          <button id="12PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(12), event, setAppointments)}>12PM</button>
+          <button id="2PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(14), event, setAppointments)}>2PM</button>
+          <button id="4PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(16), event, setAppointments)}>4PM</button>
       </div>
       <div>
         {
@@ -51,9 +49,15 @@ export default function CoachAppointments({ coach_id, date }) {
                   appt.status === "Booked" &&
                   <>
                     <li>Coach Phone Number: {appt.coach.phone_number}</li>
-                    <li>Studnet Name: {appt.student.first_name} {appt.student.last_name}</li>
+                    <li>Student Name: {appt.student.first_name} {appt.student.last_name}</li>
                     <li>Student Phone Number: {appt.student.phone_number}</li>
-                    <li><button onClick={(event) => markAppointmentComplete(event, appt, appt.coach)}>Mark Appointment Complete</button></li>
+                    <li>
+                      <>
+                        <form onSubmit={(e) => markAppointmentComplete(e, appt, appt.coach)}>
+                          <button type="submit" className="button" onClick={(event) => markAppointmentComplete(event, appt, appt.coach, setAppointments)}>Mark Appointment Complete</button>
+                        </form>
+                      </>
+                    </li>
                   </>
                 }
                 {
@@ -79,14 +83,14 @@ export default function CoachAppointments({ coach_id, date }) {
                     appt.notes === null ?
                       <>
                         <li>Notes:<br></br>
-                          <form onSubmit={(e) => submitNotes(e, appt, coach_id, setNotes)}>
+                          <form onSubmit={(e) => submitNotes(e, appt, coach_id, notes, setNotes)}>
                             <input type="text" className="input" onChange={(e) => handleChange(e, setNotes)}></input><br></br>
-                            <button type="submit" className="button" onClick={(e) => submitNotes(e, appt, coach_id, notes, setNotes)}>Submit</button>
+                            <button type="submit" className="note" onClick={(e) => submitNotes(e, appt, coach_id, notes, setNotes)}>Submit</button>
                           </form>
                         </li>
                       </> : appt.status === "Complete" && appt.notes !== null ? 
                       <>
-                        <li>Notes: {appt.notes}</li>
+                        <li>Notes : {appt.notes}</li>
                       </> : null
                 }
               </ul>
@@ -116,8 +120,7 @@ function submitNotes(event, appt, coach_id, notes, setNotes) {
   axios.post(`http://localhost:3001/api/v1/coaches/${coach_id}/setNotes`, {appointment}, 
     {withCredentials: true}
   ).then(response => {
-    // console.log(`RESPONSE: ${JSON.stringify(response)}`)
-    // setNotes(response.data.appointment.notes);
+    setNotes(response.data.appointment.notes);
   });
 }
 
@@ -134,29 +137,40 @@ function submitStudentSatisfactionScore(score, appt, coach_id, setScore) {
   });
 }
 
-function markAppointmentComplete(event, appointment, coach_id, triggerUpdate) {
-  if (new Date() < appointment.start_datetime) {
+function markAppointmentComplete(event, appt, coach_id, setAppointments) {
+  event.preventDefault();
+  if (new Date() < appt.start_datetime) {
     throw new Error('Cannot transition appointment to completed until it has happened');
-  } else {
-    axios.post(`http://localhost:3001/api/v1/coaches/${coach_id}/markAppointmentComplete`, {appointment}, {withCredentials: true}).then(response => {
-      if (response.data.appointment) {
-        triggerUpdate(''); 
-      }
-    })
   }
+
+  let appointment = {
+    id: appt.id
+  }
+
+  axios.post(`http://localhost:3001/api/v1/coaches/${coach_id}/markAppointmentComplete`, 
+    {appointment}, 
+    {withCredentials: true}
+  ).then(response => {
+    if (response.data.appointment) {
+      // setAppointments(response.data.appointment); 
+    }
+  });
 }
 
-function createAppointmentForCoachAndDateTime(coach_id, date, event, triggerUpdate) {
+function createAppointmentForCoachAndDateTime(coach_id, date, event, setAppointments) {
+  event.preventDefault();
+
   let appointment = {
     coach_id: coach_id,
     status: "Available",
     start_datetime: new Date(date)
   }
+
   axios.post(`http://localhost:3001/api/v1/coaches/${coach_id}/appointment`,
     {appointment}, {withCredentials: true}
   ).then(response => {
     if (response.data.appointment) {
-      triggerUpdate();
+      // setAppointments([response.data.appointment]);
     }
   });
 }

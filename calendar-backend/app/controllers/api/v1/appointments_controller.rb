@@ -17,6 +17,7 @@ class Api::V1::AppointmentsController < ApplicationController
   def transition_appointment_to_complete
     appointment = Appointment.find_by(id: appointment_params[:id])
     if appointment && appointment.status == "Booked" && appointment.start_datetime < DateTime.now()
+      Rails.logger.fatal("TESTING")
       appointment.status = "Complete"
       appointment.save
 
@@ -33,7 +34,7 @@ class Api::V1::AppointmentsController < ApplicationController
     else
       render json: {
         status: 500,
-        errors: [appointment.errors.full_messages]
+        errors: ["Appointment has not occurred yet", appointment.errors.full_messages]
       }
     end
   end
@@ -54,15 +55,16 @@ class Api::V1::AppointmentsController < ApplicationController
   end
 
   def create
-    @appointment = Appointment.new(appointment_params)
-    if @appointment.save
+    appointment = Appointment.new(appointment_params)
+    if appointment.save
       render json: {
-        appointment: @appointment
+        appointment: appointment
       }
     else
+      Rails.logger.fatal("CReATE ISSUE #{appointment.errors.full_messages}")
       render json: {
         status: 500,
-        errors: @appointment.errors.full_messages
+        errors: appointment.errors.full_messages
       }
     end
   end

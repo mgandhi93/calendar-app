@@ -2,7 +2,7 @@ class Appointment < ApplicationRecord
   belongs_to :coach, class_name: "User"
   belongs_to :student, class_name: "User", optional: true
 
-  validates :student_satisfaction_score, inclusion: 1..5
+  validates :student_satisfaction_score, allow_nil: true, inclusion: 1..5
 
   validates :start_datetime, uniqueness: true, on: :create
   validates :status, inclusion: { in: ["Available", "Booked", "Complete"] }
