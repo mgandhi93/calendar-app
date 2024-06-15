@@ -3,18 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function Home(props) {
-    const navigate = useNavigate();
-
-    function handleClick() {
-        axios.delete('http://localhost:3001/logout', 
-            {withCredentials: true}
-        ).then(response => {
-            props.handleLogout();
-            navigate('/');
-        })
-        .catch(error => console.log(error))
-    }
-
     return (
         <div>
             {

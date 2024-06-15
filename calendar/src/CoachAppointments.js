@@ -4,7 +4,6 @@ import './CoachAppointments.css';
 
 export default function CoachAppointments({ coach_id, date }) {
   const [appointments, setAppointments] = useState(null);
-  const [update, triggerUpdate] = useState(null);
   const [score, setScore] = useState(null);
   const [notes, setNotes] = useState(null);
 
@@ -19,22 +18,22 @@ export default function CoachAppointments({ coach_id, date }) {
           console.log("Failed to get appointments for coach");
         }
       })
-  }, [date, coach_id, update, score, notes]);
+  }, [date, coach_id, score, notes]);
 
   useEffect(() => {
     formatButtons(appointments);
-  }, [appointments, date, update]);
+  }, [appointments, date]);
     
   return (
     <>
       <div>
         <h2>Appointment Slots for {date.toString()}</h2>
         <br></br>
-        <button id="8AM" className="button"  onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(8), event, setAppointments) }>8AM</button>
-          <button id="10AM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(10), event, setAppointments)}>10AM</button>
-          <button id="12PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(12), event, setAppointments)}>12PM</button>
-          <button id="2PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(14), event, setAppointments)}>2PM</button>
-          <button id="4PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(16), event, setAppointments)}>4PM</button>
+        <button id="8AM" className="button"  onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(8), event, appointments, setAppointments) }>8AM</button>
+          <button id="10AM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(10), event, appointments, setAppointments)}>10AM</button>
+          <button id="12PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(12), event, appointments, setAppointments)}>12PM</button>
+          <button id="2PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(14), event, appointments, setAppointments)}>2PM</button>
+          <button id="4PM" className="button" onClick={(event) => createAppointmentForCoachAndDateTime(coach_id, date.setHours(16), event, appointments, setAppointments)}>4PM</button>
       </div>
       <div>
         {
@@ -152,12 +151,12 @@ function markAppointmentComplete(event, appt, coach_id, setAppointments) {
     {withCredentials: true}
   ).then(response => {
     if (response.data.appointment) {
-      // setAppointments(response.data.appointment); 
+      setAppointments(response.data.appointment);
     }
   });
 }
 
-function createAppointmentForCoachAndDateTime(coach_id, date, event, setAppointments) {
+function createAppointmentForCoachAndDateTime(coach_id, date, event, appointments, setAppointments) {
   event.preventDefault();
 
   let appointment = {
@@ -170,7 +169,8 @@ function createAppointmentForCoachAndDateTime(coach_id, date, event, setAppointm
     {appointment}, {withCredentials: true}
   ).then(response => {
     if (response.data.appointment) {
-      // setAppointments([response.data.appointment]);
+      let appts = appointments.push(response.data.appointment);
+      setAppointments(appts);
     }
   });
 }
@@ -180,6 +180,7 @@ function formatButtons(appointments) {
     button.disabled = false;
   });
 
+  // make api call to getAppointmentsForDate
   appointments?.forEach(appt => {
     let hours = new Date(appt.start_datetime).getHours();
     switch (hours) {
