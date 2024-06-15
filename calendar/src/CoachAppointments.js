@@ -52,8 +52,8 @@ export default function CoachAppointments({ coach_id, date }) {
                     <li>Student Phone Number: {appt.student.phone_number}</li>
                     <li>
                       <>
-                        <form onSubmit={(e) => markAppointmentComplete(e, appt, appt.coach)}>
-                          <button type="submit" className="button" onClick={(event) => markAppointmentComplete(event, appt, appt.coach, setAppointments)}>Mark Appointment Complete</button>
+                        <form onSubmit={(e) => markAppointmentComplete(e, appt, appt.coach, appointments, setAppointments)}>
+                          <button type="submit" className="button" onClick={(event) => markAppointmentComplete(event, appt, appt.coach, appointments, setAppointments)}>Mark Appointment Complete</button>
                         </form>
                       </>
                     </li>
@@ -119,7 +119,7 @@ function submitNotes(event, appt, coach_id, notes, setNotes) {
   axios.post(`http://localhost:3001/api/v1/coaches/${coach_id}/setNotes`, {appointment}, 
     {withCredentials: true}
   ).then(response => {
-    setNotes(response.data.appointment.notes);
+    setNotes(response.data.appointment.notes + " ");
   });
 }
 
@@ -136,7 +136,7 @@ function submitStudentSatisfactionScore(score, appt, coach_id, setScore) {
   });
 }
 
-function markAppointmentComplete(event, appt, coach_id, setAppointments) {
+function markAppointmentComplete(event, appt, coach_id, appointments, setAppointments) {
   event.preventDefault();
   if (new Date() < appt.start_datetime) {
     throw new Error('Cannot transition appointment to completed until it has happened');
@@ -151,7 +151,9 @@ function markAppointmentComplete(event, appt, coach_id, setAppointments) {
     {withCredentials: true}
   ).then(response => {
     if (response.data.appointment) {
-      setAppointments(response.data.appointment);
+      let index = appointments.findIndex(x => x.id === response.data.appointment.id);
+      appointments[index] = index ? response.data.appointment : appointments[index];
+      setAppointments([...appointments]);
     }
   });
 }
@@ -169,8 +171,8 @@ function createAppointmentForCoachAndDateTime(coach_id, date, event, appointment
     {appointment}, {withCredentials: true}
   ).then(response => {
     if (response.data.appointment) {
-      let appts = appointments.push(response.data.appointment);
-      setAppointments(appts);
+      appointments.push(response.data.appointment);
+      setAppointments([...appointments]);
     }
   });
 }
@@ -180,7 +182,6 @@ function formatButtons(appointments) {
     button.disabled = false;
   });
 
-  // make api call to getAppointmentsForDate
   appointments?.forEach(appt => {
     let hours = new Date(appt.start_datetime).getHours();
     switch (hours) {

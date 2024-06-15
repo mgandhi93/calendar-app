@@ -3,8 +3,7 @@ import Calendar from 'react-calendar';
 import CoachAppointments from './CoachAppointments.js';
 
 export default function CoachCalendar({ coach_id }) {
-  const [date, setDate] = useState(new Date());
-  const [appointments, setAppointments] = useState([]);
+  const [date, setDate] = useState(new Date(new Date().setHours(0,0,0,0)));
 
   return(
     <>

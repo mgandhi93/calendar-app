@@ -4,7 +4,7 @@ class Api::V1::AppointmentsController < ApplicationController
     if coach
       render json: {
         coach: coach,
-        appointments: coach.appointments
+        appointments: coach.appointments.as_json(include: [:coach, :student])
       }
     else
       render json: {
@@ -17,13 +17,12 @@ class Api::V1::AppointmentsController < ApplicationController
   def transition_appointment_to_complete
     appointment = Appointment.find_by(id: appointment_params[:id])
     if appointment && appointment.status == "Booked" && appointment.start_datetime < DateTime.now()
-      Rails.logger.fatal("TESTING")
       appointment.status = "Complete"
       appointment.save
 
       if appointment.errors.empty?
         render json: {
-          appointment: appointment
+          appointment: appointment.as_json(include: [:coach, :student])
         }
       else 
         render json: {
@@ -58,7 +57,7 @@ class Api::V1::AppointmentsController < ApplicationController
     appointment = Appointment.new(appointment_params)
     if appointment.save
       render json: {
-        appointment: appointment
+        appointment: appointment.as_json(include: [:coach, :student])
       }
     else
       Rails.logger.fatal("CReATE ISSUE #{appointment.errors.full_messages}")
@@ -75,7 +74,7 @@ class Api::V1::AppointmentsController < ApplicationController
       appointment.notes = appointment_params[:notes]
       if appointment.save
         render json: {
-          appointment: appointment
+          appointment: appointment.as_json(include: [:coach, :student])
         }
       else
         render json: {
@@ -112,7 +111,7 @@ class Api::V1::AppointmentsController < ApplicationController
       appointment.student_satisfaction_score = appointment_params[:student_satisfaction_score].to_i
       if appointment.save
         render json: {
-          appointment: appointment
+          appointment: appointment.as_json(include: [:coach, :student])
         }
       else
         render json: {
@@ -148,7 +147,7 @@ class Api::V1::AppointmentsController < ApplicationController
       appt.save
 
       render json: {
-          appointment: appt
+          appointment: appt.as_json(include: [:coach, :student])
       }
     else
       render json: {
